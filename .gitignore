@@ -1,4 +1,2 @@
-./qbft_network/node1/logs/*
-./qbft_network/node1/logs/*
-./qbft_network/node1/logs/*
-./qbft_network/node1/logs/*
+./qbft_network/*
+./networkFiles/*
