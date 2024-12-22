@@ -83,7 +83,7 @@ node_counter=1
 
         mkdir -p $QBFT_HOME/qbft_network/node$node_counter/data && mkdir -p $QBFT_HOME/qbft_network/node$node_counter/logs
         cp -r "$dir/"* "$QBFT_HOME/qbft_network/node$node_counter/data/"
-        echo "Copied from $dir to n$QBFT_HOME/qbft_network/node$node_counter/data"
+        echo "Copied from $dir to $QBFT_HOME/qbft_network/node$node_counter/data"
         node_counter=$((node_counter + 1)) # Increment the counter for the next node
     else
         echo "Warning: More than 4 directories found in network_files/keys. Skipping remaining."
