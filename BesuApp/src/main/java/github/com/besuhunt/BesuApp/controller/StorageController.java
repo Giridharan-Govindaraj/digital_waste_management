@@ -21,7 +21,7 @@ public class StorageController {
 
     @PostMapping("/deploy")
     public String deploy() throws Exception {
-       return this.storageService.deploy();
+       return this.storageService.deploy_();
     }
     @GetMapping("/owner")
     public String getOwner( @RequestParam String contractAddress) throws Exception {
