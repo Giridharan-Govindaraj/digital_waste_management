@@ -1,7 +1,2 @@
-# besu_hunt
-
-to generate Wrapper for a contract we need .abi and .bin files which is placed in he resource folder
-
-the following command used for wrapper generation
-
-solidity generate -b src/main/resources/contracts/Storage/Storage.bin -a src/main/resources/contracts/Storage/Storage.abi -o src/main/java -p github.com.besuhunt.contracts
+# Digital Waste Management
+A blockchain-based platform using Hyperledger Besu to tokenize various types of waste,enabling asset-backed tokens for investment and trading along with reward system for waste collectors.
