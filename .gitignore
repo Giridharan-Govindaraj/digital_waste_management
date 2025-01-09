@@ -1,2 +1,3 @@
 ./qbft_network/*
 ./networkFiles/*
+./scripts/node_modules

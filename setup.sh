@@ -69,9 +69,7 @@ copyGenesisFile(){
 }
 copyKeyPairs(){
 
-    #!/bin/bas2025-01-02 20:34:07.298+05:30 | main | INFO  | GenerateBlockchainConfig | Generating QBFT extra data.
-2025-01-02 20:34:07.301+05:30 | main | INFO  | GenerateBlockchainConfig | Writing genesis file.
-h
+
     echo "Copying node KeyPairs"
     # List all directories in network_files/keys
     # dirs=($QBFT_HOME/networkFiles/keys/*)
