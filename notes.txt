@@ -7,6 +7,24 @@ the following command used for wrapper generation
 solidity generate -b src/main/resources/contracts/Storage/Storage.bin -a src/main/resources/contracts/Storage/Storage.abi -o src/main/java -p github.com.besuhunt.contracts
 
 
+wrapper generation
+-------------------
+
+Diamond
+-------
+solidity generate -b src/main/resources/contracts/diamond/Diamond.bin -a src/main/resources/contracts/diamond/Diamond.abi -o src/main/java -p github.com.besuhunt.BesuApp.contracts.diamond
+
+DiamondInIt
+-----------
+solidity generate -b src/main/resources/contracts/diamond/upgradeInitializers/DiamondInit.bin -a src/main/resources/contracts/diamond/upgradeInitializers/DiamondInit.abi -o src/main/java -p github.com.besuhunt.BesuApp.contracts.diamond.upgrage
+
+FacetCutacets
+--------------
+solidity generate -b src/main/resources/contracts/diamond/facets/DiamondCutFacet.bin -a src/main/resources/contracts/diamond/facets/DiamondCutFacet.abi -o src/main/java -p github.com.besuhunt.BesuApp.contracts.diamond.facets
+solidity generate -b src/main/resources/contracts/diamond/facets/DiamondLoupeFacet.bin -a src/main/resources/contracts/diamond/facets/DiamondLoupeFacet.abi -o src/main/java -p github.com.besuhunt.BesuApp.contracts.diamond.facets
+solidity generate -b src/main/resources/contracts/diamond/facets/OwnershipFacet.bin -a src/main/resources/contracts/diamond/facets/OwnershipFacet.abi -o src/main/java -p github.com.besuhunt.BesuApp.contracts.diamond.facets
+
+-------------------------------------------------------------------------------------------
 besu operator generate-blockchain-config --config-file=$QBFT_HOME/config/qbftConfigFile.json --to=$QBFT_HOME/networkFiles --private-key-file-name=key
 
 

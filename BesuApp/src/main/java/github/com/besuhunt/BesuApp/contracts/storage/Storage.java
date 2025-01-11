@@ -1,4 +1,4 @@
-package github.com.besuhunt.BesuApp.contracts;
+package github.com.besuhunt.BesuApp.contracts.storage;
 
 import java.math.BigInteger;
 import java.util.Arrays;

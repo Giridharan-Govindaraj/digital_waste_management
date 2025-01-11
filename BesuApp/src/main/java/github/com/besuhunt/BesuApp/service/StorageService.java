@@ -1,6 +1,6 @@
 package github.com.besuhunt.BesuApp.service;
 
-import github.com.besuhunt.BesuApp.contracts.Storage;
+import github.com.besuhunt.BesuApp.contracts.storage.Storage;
 import github.com.besuhunt.BesuApp.utils.BesuUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
