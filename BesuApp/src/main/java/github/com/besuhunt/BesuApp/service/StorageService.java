@@ -2,7 +2,6 @@ package github.com.besuhunt.BesuApp.service;
 
 import github.com.besuhunt.BesuApp.contracts.Storage;
 import github.com.besuhunt.BesuApp.utils.BesuUtil;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -10,13 +9,10 @@ import org.web3j.crypto.Credentials;
 import org.web3j.crypto.RawTransaction;
 import org.web3j.crypto.TransactionEncoder;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.RawTransactionManager;
-import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.tx.gas.StaticGasProvider;
 import org.web3j.utils.Numeric;
 
@@ -109,9 +105,9 @@ public class StorageService {
         return receipt.get().getContractAddress();
     }
 
-    
+
     private Optional<TransactionReceipt> getTransactionReceipt(String hash) throws ExecutionException, InterruptedException {
-        return this.web3j.ethGetTransactionReceipt(hash).sendAsync().get().getTransactionReceipt(); 
+        return this.web3j.ethGetTransactionReceipt(hash).sendAsync().get().getTransactionReceipt();
     }
 
     public String getOwner(String contractAddress) throws Exception {
