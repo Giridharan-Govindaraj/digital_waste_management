@@ -3,6 +3,7 @@ package github.com.besuhunt.BesuApp.utils;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,6 +25,26 @@ public class PropertyUtil {
     @Value("${besu.gaslimit}")
     private Long gasLimit;
 
+    @Value("${besu.chainID}")
+    private Long chainID;
+
+
+    @Value("${besu.contract.diamond.facet.DiamondCutFacet.abi}")
+    private Resource diamondCutFacetABI;
+
+    @Value("${besu.contract.diamond.facet.DiamondLoupeFacet.abi}")
+    private Resource diamondLoupeFacetABI;
+
+    @Value("${besu.contract.diamond.facet.OwnershipFacet.abi}")
+    private Resource ownershipFacetABI;
+
+
+    public Resource getDiamondCutFacetABI(){ return diamondCutFacetABI;}
+
+    public Resource getDiamondLoupeFacetABI(){ return diamondLoupeFacetABI;}
+
+    public Resource getOwnershipFacetABI(){ return ownershipFacetABI;}
+
     public String getPvk_alice() {
         return pvk_alice;
     }
@@ -43,4 +64,6 @@ public class PropertyUtil {
     public Long getGasLimit(){
         return gasLimit;
     }
+
+    public Long getChainID(){ return chainID;}
 }

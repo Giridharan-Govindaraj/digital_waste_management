@@ -36,12 +36,9 @@ public class BesuUtil {
         return Credentials.create(this.propertyUtil.getPvk_john());
     }
 
-    public  RawTransactionManager rawTransactionManager(Web3j web3j, Credentials credentials){
-        return new RawTransactionManager(web3j,credentials);
-    }
 
-    public  RawTransactionManager rawTransactionManager(Web3j web3j, Credentials credentials, Long chainID){
-        return new RawTransactionManager(web3j,credentials,chainID);
+    public  RawTransactionManager rawTransactionManager(Web3j web3j, Credentials credentials){
+        return new RawTransactionManager(web3j,credentials,propertyUtil.getChainID());
     }
 
     public  StaticGasProvider staticGasProvider(){

@@ -35,7 +35,7 @@ public class StorageService {
         this.web3j = besuUtil.web3j();
         this.credentials = besuUtil.credentials_Alice();
         this.gasProvider = besuUtil.staticGasProvider();
-        this.rawTransactionManager = besuUtil.rawTransactionManager(this.web3j, credentials, Long.valueOf("1337"));
+        this.rawTransactionManager = besuUtil.rawTransactionManager(this.web3j, credentials);
     }
 
     public String deploy() throws Exception {
