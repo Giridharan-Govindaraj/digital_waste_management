@@ -25,6 +25,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.gas.StaticGasProvider;
+import org.web3j.utils.Numeric;
 
 import java.io.File;
 import java.io.IOException;
@@ -111,8 +112,17 @@ public class DiamondService {
 
         // Encode the function call to send it as a transaction
         String encodedFunction = FunctionEncoder.encode(function);
+
+        byte[] byteArray= Numeric.hexStringToByteArray(encodedFunction);
+        if (byteArray.length != 4) {
+            throw new IllegalArgumentException("Hex string must represent exactly 4 bytes");
+        }
+
+        // Create Bytes4 object and add to list
+        Bytes4 bytes4Selector = new Bytes4(byteArray);
+
         logger.info("encodedFunction:{}",encodedFunction);
-        Diamond.DiamondArgs diamondArgs = getDiamondArgs(credentials.getAddress(), diamondInitContractAddress, encodedFunction.substring(2));
+        Diamond.DiamondArgs diamondArgs = getDiamondArgs(credentials.getAddress(), diamondInitContractAddress, bytes4Selector.getValue());
 
         logger.info("Started deploying Diamond contract.....");
         String diamondContractAddress=deployDiamondContract(facetCuts,diamondArgs);
@@ -246,15 +256,14 @@ public class DiamondService {
                     signatureBuilder.append(inputs.get(i).get(TYPE).asText());
                 }
                 signatureBuilder.append(")");
-                byte[] hash = Hash.sha3(signatureBuilder.toString().getBytes());
 
-                logger.info("function:{}  signature:{}",signatureBuilder.toString(),Hash.sha3(signatureBuilder.toString()).substring(0,10));
-                // Extract the first 4 bytes
-                byte[] selector = new byte[4];
-                System.arraycopy(hash, 0, selector, 0, 4);
-
+                String hexString=Hash.sha3(signatureBuilder.toString()).substring(0,10);
+                byte[] byteArray= Numeric.hexStringToByteArray(hexString);
+                if (byteArray.length != 4) {
+                    throw new IllegalArgumentException("Hex string must represent exactly 4 bytes");
+                }
                 // Create Bytes4 object and add to list
-                Bytes4 bytes4Selector = new Bytes4(selector);
+                Bytes4 bytes4Selector = new Bytes4(byteArray);
 
                 functionSignatures.add(bytes4Selector);
             }
@@ -268,8 +277,9 @@ public class DiamondService {
        return new Diamond.FacetCut(new Address(facetAddress), new Uint8(action.ordinal()),selector);
     }
 
-    private Diamond.DiamondArgs getDiamondArgs(String owner, String address, String functionCall){
-        return new Diamond.DiamondArgs(owner,address,functionCall.getBytes());
+    private Diamond.DiamondArgs getDiamondArgs(String owner, String address, byte[] functionCall){
+        return new Diamond.DiamondArgs(owner,address,functionCall);
     }
+
 
 }
