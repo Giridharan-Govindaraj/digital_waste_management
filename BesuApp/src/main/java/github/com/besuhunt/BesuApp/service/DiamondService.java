@@ -10,18 +10,28 @@ import github.com.besuhunt.BesuApp.contracts.diamond.facets.OwnershipFacet;
 import github.com.besuhunt.BesuApp.contracts.diamond.upgrade.DiamondInit;
 import github.com.besuhunt.BesuApp.utils.BesuUtil;
 import github.com.besuhunt.BesuApp.utils.PropertyUtil;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.web3j.abi.FunctionEncoder;
-import org.web3j.abi.datatypes.Address;
-import org.web3j.abi.datatypes.DynamicArray;
-import org.web3j.abi.datatypes.Function;
+import org.web3j.abi.FunctionReturnDecoder;
+import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.*;
 import org.web3j.abi.datatypes.generated.Bytes4;
 import org.web3j.abi.datatypes.generated.Uint8;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.Hash;
+import org.web3j.crypto.RawTransaction;
+import org.web3j.crypto.TransactionEncoder;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.RemoteFunctionCall;
+import org.web3j.protocol.core.methods.request.Transaction;
+import org.web3j.protocol.core.methods.response.EthCall;
+import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.gas.StaticGasProvider;
@@ -30,10 +40,10 @@ import org.web3j.utils.Numeric;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class DiamondService {
@@ -62,6 +72,18 @@ public class DiamondService {
     }
 
 
+    public void getFacets(String contractAddress, String func) throws Exception {
+        String out = rawTransactionManager.sendCall(contractAddress, func, DefaultBlockParameterName.LATEST);
+
+        System.out.println(out);
+
+
+
+    }
+    private Optional<TransactionReceipt> getTransactionReceipt(String hash) throws ExecutionException, InterruptedException {
+        return this.web3j.ethGetTransactionReceipt(hash).sendAsync().get().getTransactionReceipt();
+    }
+
     public String deployDiamond() throws Exception {
 
 
@@ -78,7 +100,8 @@ public class DiamondService {
         logger.info("diamondCutFacetContractAddress: {}",diamondCutFacetContractAddress);
 
         logger.info("Started generating function signatures of DiamondCutFacet contract.....");
-        DynamicArray<Bytes4> diamondCutFacetSelectors = getSelectors(this.propertyUtil.getDiamondCutFacetABI().getFile());
+        logger.info("path:{}",this.propertyUtil.getDiamondCutFacetJSON().getFile().getAbsolutePath());
+        DynamicArray<Bytes4> diamondCutFacetSelectors = getSelectors(this.propertyUtil.getDiamondCutFacetJSON().getFile().getAbsolutePath());
 
         Diamond.FacetCut diamondCutFacetCut = getFacetCut(diamondCutFacetContractAddress, FacetCutAction.ADD, diamondCutFacetSelectors);
         facetCuts.add(diamondCutFacetCut);
@@ -88,7 +111,7 @@ public class DiamondService {
         logger.info("diamondLoupeFacetContractAddress: {}",diamondLoupeFacetContractAddress);
 
         logger.info("Started generating function signatures of diamondLoupeFacet contract.....");
-        DynamicArray<Bytes4> diamondLoupeFacetSelectors = getSelectors(this.propertyUtil.getDiamondLoupeFacetABI().getFile());
+        DynamicArray<Bytes4> diamondLoupeFacetSelectors = getSelectors(this.propertyUtil.getDiamondLoupeFacetJSON().getFile().getAbsolutePath());
 
         Diamond.FacetCut diamondLoupeFacetCut = getFacetCut(diamondLoupeFacetContractAddress, FacetCutAction.ADD, diamondLoupeFacetSelectors);
         facetCuts.add(diamondLoupeFacetCut);
@@ -98,31 +121,34 @@ public class DiamondService {
         logger.info("ownerShipFacetContractAddress: {}",ownerShipFacetContractAddress);
 
         logger.info("Started generating function signatures of OwnerShipFacet contract.....");
-        DynamicArray<Bytes4>  ownerShipFacetSelectors = getSelectors(this.propertyUtil.getOwnershipFacetABI().getFile());
+        DynamicArray<Bytes4>  ownerShipFacetSelectors = getSelectors(this.propertyUtil.getOwnershipFacetJSON().getFile().getAbsolutePath());
 
         Diamond.FacetCut ownerShipFacetFacetCut = getFacetCut(ownerShipFacetContractAddress, FacetCutAction.ADD, ownerShipFacetSelectors);
         facetCuts.add(ownerShipFacetFacetCut);
 
-        logger.info("Creating function for init");
-        Function function = new Function(
-                "init", // Function name
-                Collections.emptyList(), // No input parameters
-                Collections.emptyList()  // No output parameters
-        );
+//        logger.info("Creating function for init");
+//        Function function = new Function(
+//                "init", // Function name
+//                Collections.emptyList(), // No input parameters
+//                Collections.emptyList()  // No output parameters
+//        );
+//
+//        // Encode the function call to send it as a transaction
+//        String encodedFunction = FunctionEncoder.encode(function);
+//
+//        byte[] byteArray= Numeric.hexStringToByteArray(encodedFunction);
+//        if (byteArray.length != 4) {
+//            throw new IllegalArgumentException("Hex string must represent exactly 4 bytes");
+//        }
+//
+//        // Create Bytes4 object and add to list
+//        Bytes4 bytes4Selector = new Bytes4(byteArray);
+//
+//        logger.info("encodedFunction:{}",encodedFunction);
 
-        // Encode the function call to send it as a transaction
-        String encodedFunction = FunctionEncoder.encode(function);
+       byte[] funcCall = getSelector(this.propertyUtil.getDiamondInitJSON().getFile().getAbsolutePath(),"init");
 
-        byte[] byteArray= Numeric.hexStringToByteArray(encodedFunction);
-        if (byteArray.length != 4) {
-            throw new IllegalArgumentException("Hex string must represent exactly 4 bytes");
-        }
-
-        // Create Bytes4 object and add to list
-        Bytes4 bytes4Selector = new Bytes4(byteArray);
-
-        logger.info("encodedFunction:{}",encodedFunction);
-        Diamond.DiamondArgs diamondArgs = getDiamondArgs(credentials.getAddress(), diamondInitContractAddress, bytes4Selector.getValue());
+        Diamond.DiamondArgs diamondArgs = getDiamondArgs(credentials.getAddress(), diamondInitContractAddress, funcCall);
 
         logger.info("Started deploying Diamond contract.....");
         String diamondContractAddress=deployDiamondContract(facetCuts,diamondArgs);
@@ -242,34 +268,83 @@ public class DiamondService {
 
 
 
-    private DynamicArray<Bytes4> getSelectors(File file) throws IOException {
-        ObjectMapper obj=new ObjectMapper();
-        JsonNode abiJson=obj.readTree(file);
+    private DynamicArray<Bytes4> getSelectors(String file) throws Exception {
+        JSONObject jsonObj=new JSONObject(new String(Files.readAllBytes(Paths.get(file))));
+        JSONArray abi=null;
+        JSONObject hashes=null;
         List<Bytes4> functionSignatures = new ArrayList<>();
-        for (JsonNode entry : abiJson) {
-            if (FUNCTION.equals(entry.get(TYPE).asText())) {
-                String name = entry.get(NAME).asText();
-                StringBuilder signatureBuilder = new StringBuilder(name).append("(");
-                JsonNode inputs = entry.get(INPUTS);
-                for (int i = 0; i < inputs.size(); i++) {
-                    if (i > 0) signatureBuilder.append(",");
-                    signatureBuilder.append(inputs.get(i).get(TYPE).asText());
-                }
-                signatureBuilder.append(")");
 
-                String hexString=Hash.sha3(signatureBuilder.toString()).substring(0,10);
-                byte[] byteArray= Numeric.hexStringToByteArray(hexString);
-                if (byteArray.length != 4) {
-                    throw new IllegalArgumentException("Hex string must represent exactly 4 bytes");
-                }
-                // Create Bytes4 object and add to list
-                Bytes4 bytes4Selector = new Bytes4(byteArray);
-
-                functionSignatures.add(bytes4Selector);
-            }
+        if(jsonObj.has("abi")){
+            abi=jsonObj.getJSONArray("abi");
+        }else{
+            throw new Exception("abi is not present");
+        }
+        if(jsonObj.has("hashes")){
+            hashes=jsonObj.getJSONObject("hashes");
+        }else{
+            throw new Exception("hashes is not present");
         }
 
+        for(Object key:abi){
+            JSONObject obj=(JSONObject) key;
+            if(obj.has(TYPE) && (obj.getString(TYPE).equals(FUNCTION))){
+                for (String func:hashes.keySet()){
+                    if(func.contains(obj.getString(NAME))){
+                        byte[] byteArray= Numeric.hexStringToByteArray(hashes.getString(func));
+                        if (byteArray.length != 4) {
+                            throw new IllegalArgumentException("Hex string must represent exactly 4 bytes");
+                        }
+                        // Create Bytes4 object and add to list
+                        Bytes4 bytes4Selector = new Bytes4(byteArray);
+                        logger.info("function {} with signature hash {}",obj.getString(NAME),Numeric.toHexString(bytes4Selector.getValue()));
+                        functionSignatures.add(bytes4Selector);
+                        break;
+                    }
+                }
+
+            }
+        }
         return new DynamicArray<>(functionSignatures);
+    }
+
+    private  byte[] getSelector(String file, String funcname) throws Exception {
+        JSONObject jsonObj=new JSONObject(new String(Files.readAllBytes(Paths.get(file))));
+        JSONArray abi=null;
+        JSONObject hashes=null;
+        byte[] byteArray=null;
+        List<Bytes4> functionSignatures = new ArrayList<>();
+
+        if(jsonObj.has("abi")){
+            abi=jsonObj.getJSONArray("abi");
+        }else{
+            throw new Exception("abi is not present");
+        }
+        if(jsonObj.has("hashes")){
+            hashes=jsonObj.getJSONObject("hashes");
+        }else{
+            throw new Exception("hashes is not present");
+        }
+
+        for(Object key:abi){
+            JSONObject obj=(JSONObject) key;
+            if(obj.has(TYPE) && (obj.getString(TYPE).equals(FUNCTION)) && obj.getString(NAME).equals(funcname)){
+                for (String func:hashes.keySet()){
+                    if(func.contains(obj.getString(NAME))){
+                        byteArray= Numeric.hexStringToByteArray(hashes.getString(func));
+                        if (byteArray.length != 4) {
+                            throw new IllegalArgumentException("Hex string must represent exactly 4 bytes");
+                        }
+                        logger.info("function {} with signature hash {}",funcname,Numeric.toHexString(byteArray));
+                        break;
+                    }
+                }
+
+            }
+        }
+        if(byteArray==null){
+            throw new Exception("function "+funcname+" is not present");
+        }
+        return byteArray;
     }
 
     private Diamond.FacetCut getFacetCut(String facetAddress, FacetCutAction action,DynamicArray<Bytes4> selector){

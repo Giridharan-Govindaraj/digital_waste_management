@@ -204,5 +204,7 @@ public class DiamondLoupeFacet extends Contract {
             this.facetAddress = facetAddress.getValue();
             this.functionSelectors = functionSelectors.getValue().stream().map(v -> v.getValue()).collect(Collectors.toList());
         }
+
+
     }
 }

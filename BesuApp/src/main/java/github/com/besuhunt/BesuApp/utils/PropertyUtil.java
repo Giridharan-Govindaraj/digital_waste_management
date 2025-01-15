@@ -29,21 +29,32 @@ public class PropertyUtil {
     private Long chainID;
 
 
-    @Value("${besu.contract.diamond.facet.DiamondCutFacet.abi}")
-    private Resource diamondCutFacetABI;
+    @Value("${besu.contract.diamond.DiamondCutFacet.json}")
+    private Resource diamondCutFacetJSON;
 
-    @Value("${besu.contract.diamond.facet.DiamondLoupeFacet.abi}")
-    private Resource diamondLoupeFacetABI;
+    @Value("${besu.contract.diamond.DiamondLoupeFacet.json}")
+    private Resource diamondLoupeFacetJSON;
 
-    @Value("${besu.contract.diamond.facet.OwnershipFacet.abi}")
-    private Resource ownershipFacetABI;
+    @Value("${besu.contract.diamond.OwnershipFacet.json}")
+    private Resource ownershipFacetJSON;
+    @Value("${besu.contract.diamond.DiamondInit.json}")
+    private Resource diamondInitJSON;
 
+    public Resource getDiamondCutFacetJSON() {
+        return diamondCutFacetJSON;
+    }
 
-    public Resource getDiamondCutFacetABI(){ return diamondCutFacetABI;}
+    public Resource getDiamondLoupeFacetJSON() {
+        return diamondLoupeFacetJSON;
+    }
 
-    public Resource getDiamondLoupeFacetABI(){ return diamondLoupeFacetABI;}
+    public Resource getOwnershipFacetJSON() {
+        return ownershipFacetJSON;
+    }
 
-    public Resource getOwnershipFacetABI(){ return ownershipFacetABI;}
+    public Resource getDiamondInitJSON() {
+        return diamondInitJSON;
+    }
 
     public String getPvk_alice() {
         return pvk_alice;
